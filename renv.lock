@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.2.2",
+    "Version": "4.3.1",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -857,10 +857,10 @@
     },
     "lightgbm": {
       "Package": "lightgbm",
-      "Version": "4.1.0",
-      "Source": "URL",
-      "RemoteType": "url",
-      "RemoteUrl": "https://github.com/microsoft/LightGBM/releases/download/v4.1.0/lightgbm-4.1.0-r-cran.tar.gz",
+      "Version": "4.1.0.99",
+      "Source": "Local",
+      "RemoteType": "local",
+      "RemoteUrl": "~/workspace/LightGBM/lightgbm_4.1.0.99.tar.gz",
       "Requirements": [
         "Matrix",
         "R",
@@ -872,7 +872,7 @@
         "parallel",
         "utils"
       ],
-      "Hash": "d9b4673519721b82e00695ef6993568c"
+      "Hash": "e6df9b12cccdce5f41f407729ae9fc88"
     },
     "lightsnip": {
       "Package": "lightsnip",
