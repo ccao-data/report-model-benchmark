@@ -113,6 +113,13 @@
       ],
       "Hash": "0cf10dab0d023d5b46a5a14387556891"
     },
+    "SnowballC": {
+      "Package": "SnowballC",
+      "Version": "0.7.1",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "46da3912f69e3e6258a033802c4af32e"
+    },
     "arrow": {
       "Package": "arrow",
       "Version": "13.0.0.1",
@@ -1323,6 +1330,30 @@
       ],
       "Hash": "04411ae66ab4659230c067c32966fc20"
     },
+    "textrecipes": {
+      "Package": "textrecipes",
+      "Version": "1.0.4",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "Matrix",
+        "R",
+        "SnowballC",
+        "cpp11",
+        "dplyr",
+        "generics",
+        "glue",
+        "lifecycle",
+        "magrittr",
+        "purrr",
+        "recipes",
+        "rlang",
+        "tibble",
+        "tokenizers",
+        "vctrs"
+      ],
+      "Hash": "f8759ddc4098c923b9761ec91b46950a"
+    },
     "tibble": {
       "Package": "tibble",
       "Version": "3.2.1",
@@ -1447,6 +1478,19 @@
         "cpp11"
       ],
       "Hash": "8548b44f79a35ba1791308b61e6012d7"
+    },
+    "tokenizers": {
+      "Package": "tokenizers",
+      "Version": "0.3.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "Rcpp",
+        "SnowballC",
+        "stringi"
+      ],
+      "Hash": "76d35ebfaaf291e08c15696c9f2ec96d"
     },
     "tune": {
       "Package": "tune",
