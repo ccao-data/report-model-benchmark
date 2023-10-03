@@ -310,7 +310,7 @@
     },
     "class": {
       "Package": "class",
-      "Version": "7.3-20",
+      "Version": "7.3-22",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -319,7 +319,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "da09d82223e669d270e47ed24ac8686e"
+      "Hash": "f91f6b29f38b8c280f2b9477787d4bb2"
     },
     "cli": {
       "Package": "cli",
@@ -857,9 +857,10 @@
     },
     "lightgbm": {
       "Package": "lightgbm",
-      "Version": "3.3.5",
-      "Source": "Repository",
-      "Repository": "CRAN",
+      "Version": "4.1.0",
+      "Source": "URL",
+      "RemoteType": "url",
+      "RemoteUrl": "https://github.com/microsoft/LightGBM/releases/download/v4.1.0/lightgbm-4.1.0-r-cran.tar.gz",
       "Requirements": [
         "Matrix",
         "R",
@@ -868,9 +869,10 @@
         "graphics",
         "jsonlite",
         "methods",
+        "parallel",
         "utils"
       ],
-      "Hash": "e6c3413a4762e6c0cb3a2d32da82a994"
+      "Hash": "d9b4673519721b82e00695ef6993568c"
     },
     "lightsnip": {
       "Package": "lightsnip",
@@ -881,7 +883,7 @@
       "RemoteUsername": "ccao-data",
       "RemoteRepo": "lightsnip",
       "RemoteRef": "master",
-      "RemoteSha": "b7b0c1cf3078a6daf52f0cf84ae0e4b6959d5041",
+      "RemoteSha": "90a2ce3672fe81ec627faa8c820353cea326ff88",
       "Requirements": [
         "butcher",
         "dials",
@@ -894,7 +896,7 @@
         "tibble",
         "zip"
       ],
-      "Hash": "2de9ef483bcb6595cc998e4c1b4cd17b"
+      "Hash": "22e191abb313bdb41760c668721dd3a1"
     },
     "listenv": {
       "Package": "listenv",

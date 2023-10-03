@@ -296,7 +296,7 @@ xgbm_wflow_gpu <- workflow() %>%
 if (params$run_gpu) {
   get_timings(
     machine = params$machine,
-    model_type = "lightgbm",
+    model_type = "xgboost",
     device_type = "gpu",
     workflow = xgbm_wflow_gpu,
     recipe = xgbm_recipe,

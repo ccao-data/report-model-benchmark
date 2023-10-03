@@ -64,7 +64,7 @@ get_timings <- function(machine,
     assessment_data_prepped %>%
       dplyr::slice(seq_len(n_shap)) %>%
       as.matrix(),
-    predcontrib = TRUE
+    type = "contrib"
   )
   tictoc::toc(log = TRUE)
 
