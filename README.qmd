@@ -1,0 +1,60 @@
+---
+title: "Model Benchmark"
+format: gfm
+---
+
+This repository compares 
+
+- Comparing performance
+- Comparing hardware
+- Model switch decision
+- Purchasing decision
+
+```{r setup, echo=FALSE, message=FALSE}
+library(dplyr)
+library(gt)
+library(readr)
+
+# Load manually created notes
+model_specs <- read_csv("model_specs.csv") %>%
+  mutate(
+    across(starts_with("Approx") & where(is.character), ~ parse_number(.x))
+  ) %>%
+  select(Key:`Approx. Peak Memory Utilization`, Notes)
+
+# Load model performance
+
+# Load model timing
+
+
+```
+
+```{r create_table, echo=FALSE, message=FALSE}
+gt() %>%
+  tab_header(
+    title = "Model Benchmark",
+    subtitle = "LightGBM CPU/GPU vs XGBoost CPU/GPU"
+  ) %>%
+  tab_footnote(
+    footnote = paste(
+      "Categoricals with over 50 values are hashed,",
+      "otherwise one-hot encoded"
+    ),
+    locations = cells_body(Type, c(2, 4, 6))
+  ) %>%
+  tab_footnote(
+    footnote = paste(
+      "Categoricals with over 50 values are hashed,",
+      "otherwise native (untouched)"
+    ),
+    locations = cells_body(Type, 5)
+  ) %>%
+  fmt_percent(starts_with("Approx.")) %>%
+  fmt_duration(
+    starts_with("Wall Time"),
+    input_units = "seconds",
+    output_units = c("hours", "minutes", "seconds")
+  ) %>%
+  fmt_currency(contains("RMSE"), decimals = 2)
+```
+

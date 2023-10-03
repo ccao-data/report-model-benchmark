@@ -1,0 +1,7 @@
+﻿Key,Server,Type,Device,Package Version,Hardware Specifications,Approx. Peak Device Utilization,Approx. Peak Memory Utilization,Wall Time (Full Run),Wall Time (Prediction),Wall Time (10K SHAP),Potential Time Savings,RMSE,COD,MKI,Notes
+ccao-lightgbm-cpu,CCAO,LightGBM,CPU,4.1.0.99,"Xeon Silver 4208 CPU @ 2.10GHz, 16 cores",100%,,,,,,,,,This is what the CCAO used for 2022 and 2023 modeling. Native categoricals
+ccao-xgboost-cpu,CCAO,XGBoost,CPU,2.0.0.1,"Xeon Silver 4208 CPU @ 2.10GHz, 16 cores",,,,,,,,,,"Categoricals with over 50 values are hashed, otherwise one-hot encoded"
+nvidia-lightgbm-cpu,NVIDIA,LightGBM,CPU,4.1.0.99,"Xeon Gold 6354 CPU @ 3.00GHz, 72 cores",100%,,,,,,,,,Native (untouched) categoricals
+nvidia-xgboost-cpu,NVIDIA,XGBoost,CPU,2.0.0.1,"Xeon Gold 6354 CPU @ 3.00GHz, 72 cores",,,,,,,,,,"Categoricals with over 50 values are hashed, otherwise one-hot encoded"
+nvidia-lightgbm-gpu,NVIDIA,LightGBM,GPU,4.1.0.99,"NVIDIA A40, 48GB",,,,,,,,,,"Categoricals with over 50 values are hashed, otherwise native (untouched)"
+nvidia-xgboost-gpu,NVIDIA,XGBoost,GPU,2.0.0.1,"NVIDIA A40, 48GB",,,,,,,,,,"Categoricals with over 50 values are hashed, otherwise one-hot encoded"
