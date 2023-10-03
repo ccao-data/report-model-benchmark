@@ -1757,9 +1757,9 @@
     "xgboost": {
       "Package": "xgboost",
       "Version": "2.0.0.1",
-      "Source": "Local",
-      "RemoteType": "local",
-      "RemoteUrl": "./xgboost_r_gpu_linux_096047c547aa71af7d53a507cecdd2a1d3124651.tar.gz",
+      "Source": "URL",
+      "RemoteType": "url",
+      "RemoteUrl": "https://s3-us-west-2.amazonaws.com/xgboost-nightly-builds/release_2.0.0/xgboost_r_gpu_linux_096047c547aa71af7d53a507cecdd2a1d3124651.tar.gz",
       "Requirements": [
         "Matrix",
         "R",
@@ -1767,7 +1767,7 @@
         "jsonlite",
         "methods"
       ],
-      "Hash": "43b3876928ae3743d6a32e19c3d4d48e"
+      "Hash": "cb1adf29cbd1f9415b0cd1b99a06f653"
     },
     "yaml": {
       "Package": "yaml",
