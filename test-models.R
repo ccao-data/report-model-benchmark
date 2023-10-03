@@ -9,15 +9,20 @@ suppressPackageStartupMessages({
   library(arrow)
   library(ccao)
   library(dplyr)
+  library(glue)
   library(here)
   library(lightgbm)
   library(lightsnip)
+  library(text2vec)
   library(textrecipes)
   library(tictoc)
   library(tidymodels)
   library(vctrs)
   library(yaml)
 })
+
+# Load helpers and recipes from files
+walk(list.files("R/", "\\.R$", full.names = TRUE), source)
 
 # Load the parameters file containing the benchmark settings
 params <- read_yaml("params.yaml")
@@ -113,9 +118,6 @@ lgbm_recipe <- recipe(training_data_full %>% select(-time_split)) %>%
 
 ## 3.2. CPU Model --------------------------------------------------------------
 
-# Set the ID for capturing CPU model artifacts
-lgbm_run_id_cpu <- paste0(params$machine, "-", "lightgbm-cpu")
-
 # Create a CPU-model-specific recipe that converts categoricals to integers but
 # otherwise keeps them untouched
 lgbm_recipe_cpu <- lgbm_recipe %>%
@@ -134,72 +136,21 @@ lgbm_wflow_cpu <- workflow() %>%
     blueprint = hardhat::default_recipe_blueprint(allow_novel_levels = TRUE)
   )
 
-# Fit model on training data and evaluate performance on holdout set
-message("Fitting LightGBM CPU model on training data")
-lgbm_wflow_cpu_fit <- fit(lgbm_wflow_cpu, data = train)
-test %>%
-  select(price = meta_sale_price) %>%
-  mutate(pred = predict(lgbm_wflow_cpu_fit, test)$.pred) %>%
-  summarize(
-    id = lgbm_run_id_cpu,
-    time = lubridate::now(),
-    rmse = rmse_vec(price, pred),
-    mae = mae_vec(price, pred),
-    mape = mape_vec(price, pred),
-    rsq = rsq_vec(price, pred),
-    cod = assessr::cod(pred / price),
-    prd = assessr::prd(pred, price),
-    prb = assessr::prb(pred, price),
-    mki = assessr::mki(pred, price)
-  ) %>%
-  arrow::write_parquet(file.path(
-    "output/performance",
-    paste0(lgbm_run_id_cpu, ".parquet")
-  ))
-
-# Fit the full data and gather timings
-tictoc::tic.clearlog()
-tictoc::tic(paste0(lgbm_run_id_cpu, "_train"))
-message("Fitting LightGBM CPU model on full data")
-lgbm_wflow_cpu_full_fit <- fit(lgbm_wflow_cpu, data = training_data_full)
-tictoc::toc(log = TRUE)
-
-# Load and prep the assessment data for prediction
-assessment_data_prepped_cpu <- bake(
-  object = lgbm_wflow_cpu_full_fit %>% extract_recipe(),
-  new_data = assessment_data,
-  all_predictors()
+# Run the benchmark workflow for CPU model
+get_timings(
+  machine = params$machine,
+  model_type = "lightgbm",
+  device_type = "cpu",
+  workflow = lgbm_wflow_cpu,
+  recipe = lgbm_recipe_cpu,
+  training_data = train,
+  test_data = test,
+  full_data = training_data_full,
+  assessment_data = assessment_data
 )
-
-# Predict on the assessment data and gather timings
-tictoc::tic(paste0(lgbm_run_id_cpu, "_predict"))
-predict(
-  lgbm_wflow_cpu_full_fit %>% extract_fit_parsnip(),
-  new_data = assessment_data_prepped_cpu
-)
-tictoc::toc(log = TRUE)
-
-# Predict 1K SHAP values and gather timings
-tictoc::tic(paste0(lgbm_run_id_cpu, "_shap"))
-predict(
-  lgbm_wflow_cpu_full_fit %>% extract_fit_engine(),
-  data = assessment_data_prepped_cpu %>% dplyr::slice(1:1000) %>% as.matrix(),
-  predcontrib = TRUE
-)
-tictoc::toc(log = TRUE)
-
-# Save CPU run timing logs to file
-bind_rows(tictoc::tic.log(format = FALSE)) %>%
-  arrow::write_parquet(file.path(
-    "output/timing",
-    paste0(lgbm_run_id_cpu, ".parquet")
-  ))
 
 
 ## 3.3. GPU Model --------------------------------------------------------------
-
-# Set the ID for capturing GPU model artifacts
-lgbm_run_id_gpu <- paste0(params$machine, "-", "lightgbm-gpu")
 
 # Create a list of categoricals to hash for GPU compatibility
 lgbm_gpu_dummy_cats <- c(
@@ -217,8 +168,7 @@ lgbm_recipe_gpu <- lgbm_recipe %>%
   step_unknown(all_of(params$model$predictor$categorical), -has_role("ID")) %>%
   textrecipes::step_dummy_hash(all_of(lgbm_gpu_dummy_cats), num_terms = 24) %>%
   step_integer(
-    all_of(params$model$predictor$categorical),
-    -all_of("ID"), -all_of(lgbm_gpu_dummy_cats),
+    all_of(setdiff(params$model$predictor$categorical, lgbm_gpu_dummy_cats)),
     strict = TRUE, zero_based = TRUE
   )
 
@@ -226,76 +176,30 @@ lgbm_recipe_gpu <- lgbm_recipe %>%
 # sets the device and removed the hashed categoricals from the list of input
 # parameters
 lgbm_wflow_gpu <- workflow() %>%
-  add_model(lgbm_model) %>%
+  add_model(
+    lgbm_model %>%
+      set_args(
+        device = "gpu",
+        categorical_feature = setdiff(
+          lgbm_params$predictor$categorical,
+          lgbm_gpu_dummy_cats
+        )
+      )
+  ) %>%
   add_recipe(
     recipe = lgbm_recipe_gpu,
     blueprint = hardhat::default_recipe_blueprint(allow_novel_levels = TRUE)
-  ) %>%
-  set_args(
-    device = "gpu",
-    categorical_feature = setdiff(
-      lgbm_params$predictor$categorical,
-      lgbm_gpu_dummy_cats
-    )
   )
 
-# Fit model on training data and evaluate performance on holdout set
-message("Fitting LightGBM GPU model on training data")
-lgbm_wflow_gpu_fit <- fit(lgbm_wflow_gpu, data = train)
-test %>%
-  select(price = meta_sale_price) %>%
-  mutate(pred = predict(lgbm_wflow_gpu_fit, test)$.pred) %>%
-  summarize(
-    id = lgbm_run_id_gpu,
-    time = lubridate::now(),
-    rmse = rmse_vec(price, pred),
-    mae = mae_vec(price, pred),
-    mape = mape_vec(price, pred),
-    rsq = rsq_vec(price, pred),
-    cod = assessr::cod(pred / price),
-    prd = assessr::prd(pred, price),
-    prb = assessr::prb(pred, price),
-    mki = assessr::mki(pred, price)
-  ) %>%
-  arrow::write_parquet(file.path(
-    "output/performance",
-    paste0(lgbm_run_id_gpu, ".parquet")
-  ))
-
-# Fit the full data and gather timings
-tictoc::tic.clearlog()
-tictoc::tic(paste0(lgbm_run_id_gpu, "_train"))
-message("Fitting LightGBM GPU model on full data")
-lgbm_wflow_gpu_full_fit <- fit(lgbm_wflow_gpu, data = training_data_full)
-tictoc::toc(log = TRUE)
-
-# Load and prep the assessment data for prediction
-assessment_data_prepped_gpu <- bake(
-  object = lgbm_wflow_gpu_full_fit %>% extract_recipe(),
-  new_data = assessment_data,
-  all_predictors()
+# Run the benchmark workflow for GPU model
+get_timings(
+  machine = params$machine,
+  model_type = "lightgbm",
+  device_type = "gpu",
+  workflow = lgbm_wflow_gpu,
+  recipe = lgbm_recipe_gpu,
+  training_data = train,
+  test_data = test,
+  full_data = training_data_full,
+  assessment_data = assessment_data
 )
-
-# Predict on the assessment data and gather timings
-tictoc::tic(paste0(lgbm_run_id_gpu, "_predict"))
-predict(
-  lgbm_wflow_gpu_full_fit %>% extract_fit_parsnip(),
-  new_data = assessment_data_prepped_gpu
-)
-tictoc::toc(log = TRUE)
-
-# Predict 1K SHAP values and gather timings
-tictoc::tic(paste0(lgbm_run_id_gpu, "_shap"))
-predict(
-  lgbm_wflow_gpu_full_fit %>% extract_fit_engine(),
-  data = assessment_data_prepped_gpu %>% dplyr::slice(1:1000) %>% as.matrix(),
-  predcontrib = TRUE
-)
-tictoc::toc(log = TRUE)
-
-# Save gpu run timing logs to file
-bind_rows(tictoc::tic.log(format = FALSE)) %>%
-  arrow::write_parquet(file.path(
-    "output/timing",
-    paste0(lgbm_run_id_gpu, ".parquet")
-  ))

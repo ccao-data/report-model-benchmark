@@ -148,7 +148,7 @@ model:
     verbose: 2
 
     parameter:
-      num_iterations: 2000
+      num_iterations: 10
       learning_rate: 0.025
       link_max_depth: TRUE
       max_bin: 512
