@@ -2,14 +2,10 @@ machine: "ccao"
 run_cpu: true
 run_gpu: false
 
-cv:
-  split_prop: 0.9
-  initial_set: 25
-  max_iterations: 70
-  no_improve: 30
-  best_metric: "rmse"
-
 model:
+  n_shap: 5000
+  split_prop: 0.9
+
   predictor:
     all: [
       "meta_township_code",

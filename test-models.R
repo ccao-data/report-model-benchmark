@@ -49,7 +49,7 @@ training_data_full <- read_parquet(here("input/training_data.parquet")) %>%
 # Create train/test split by time, with most recent observations in the test set
 split_data <- initial_time_split(
   data = training_data_full,
-  prop = params$cv$split_prop
+  prop = params$model$split_prop
 )
 test <- testing(split_data)
 train <- training(split_data)
@@ -147,7 +147,8 @@ if (params$run_cpu) {
     training_data = train,
     test_data = test,
     full_data = training_data_full,
-    assessment_data = assessment_data
+    assessment_data = assessment_data,
+    n_shap = params$model$n_shap
   )
 }
 
@@ -203,7 +204,8 @@ if (params$run_gpu) {
     training_data = train,
     test_data = test,
     full_data = training_data_full,
-    assessment_data = assessment_data
+    assessment_data = assessment_data,
+    n_shap = params$model$n_shap
   )
 }
 
@@ -277,7 +279,8 @@ if (params$run_cpu) {
     training_data = train,
     test_data = test,
     full_data = training_data_full,
-    assessment_data = assessment_data
+    assessment_data = assessment_data,
+    n_shap = params$model$n_shap
   )
 }
 
@@ -304,6 +307,7 @@ if (params$run_gpu) {
     training_data = train,
     test_data = test,
     full_data = training_data_full,
-    assessment_data = assessment_data
+    assessment_data = assessment_data,
+    n_shap = params$model$n_shap
   )
 }
