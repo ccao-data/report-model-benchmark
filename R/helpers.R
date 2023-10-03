@@ -14,7 +14,7 @@ get_timings <- function(machine,
 
   # Fit model on training data and evaluate performance on holdout set
   message(glue("Fitting {run_id} on training data"))
-  wflow_train_fit <- fit(workflow, data = training_data)
+  wflow_train_fit <- parsnip::fit(workflow, data = training_data)
 
   test_data %>%
     select(price = meta_sale_price) %>%
@@ -37,7 +37,7 @@ get_timings <- function(machine,
   message(glue("Fitting {run_id} on full data"))
   tictoc::tic.clearlog()
   tictoc::tic(glue("{run_id}_train"))
-  wflow_full_fit <- fit(workflow, data = full_data)
+  wflow_full_fit <- parsnip::fit(workflow, data = full_data)
   tictoc::toc(log = TRUE)
 
   # Load and prep the assessment data for prediction
@@ -61,7 +61,7 @@ get_timings <- function(machine,
   tictoc::tic(glue("{run_id}_shap"))
   predict(
     wflow_full_fit %>% extract_fit_engine(),
-    data = assessment_data_prepped %>%
+    assessment_data_prepped %>%
       dplyr::slice(seq_len(n_shap)) %>%
       as.matrix(),
     predcontrib = TRUE

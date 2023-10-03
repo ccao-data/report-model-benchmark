@@ -72,6 +72,20 @@
       ],
       "Hash": "539dc0c0c05636812f1080f473d2c177"
     },
+    "MatrixExtra": {
+      "Package": "MatrixExtra",
+      "Version": "0.1.14",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "Matrix",
+        "Rcpp",
+        "RhpcBLASctl",
+        "float",
+        "methods"
+      ],
+      "Hash": "430fe3baae635c639d4059a3bd0f193f"
+    },
     "R6": {
       "Package": "R6",
       "Version": "2.5.1",
@@ -102,6 +116,27 @@
         "utils"
       ],
       "Hash": "ae6cbbe1492f4de79c45fce06f967ce8"
+    },
+    "RcppArmadillo": {
+      "Package": "RcppArmadillo",
+      "Version": "0.12.6.4.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "Rcpp",
+        "methods",
+        "stats",
+        "utils"
+      ],
+      "Hash": "cafeccdc6577a445a15ce98b6a1805cf"
+    },
+    "RhpcBLASctl": {
+      "Package": "RhpcBLASctl",
+      "Version": "0.23-42",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "c966ea2957ff75e77afa5c908dfc89e1"
     },
     "SQUAREM": {
       "Package": "SQUAREM",
@@ -491,6 +526,19 @@
       "Repository": "CRAN",
       "Hash": "f7736a18de97dea803bde0a2daaafb27"
     },
+    "float": {
+      "Package": "float",
+      "Version": "0.3-1",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "methods",
+        "tools",
+        "utils"
+      ],
+      "Hash": "f3b27b4d5181bc230dde2f0314771856"
+    },
     "foreach": {
       "Package": "foreach",
       "Version": "1.5.2",
@@ -772,6 +820,17 @@
       ],
       "Hash": "bbc70840ea0f91f34dd9703efe4c96c3"
     },
+    "lgr": {
+      "Package": "lgr",
+      "Version": "0.4.4",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "R6"
+      ],
+      "Hash": "a6bc51765d7e9eeb2b225a11805527aa"
+    },
     "lhs": {
       "Package": "lhs",
       "Version": "1.1.6",
@@ -912,6 +971,18 @@
         "utils"
       ],
       "Hash": "6b3904f13346742caa3e82dd0303d4ad"
+    },
+    "mlapi": {
+      "Package": "mlapi",
+      "Version": "0.1.1",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "Matrix",
+        "R6",
+        "methods"
+      ],
+      "Hash": "12498a143cf0333be625ca133f381c28"
     },
     "modeldata": {
       "Package": "modeldata",
@@ -1232,6 +1303,25 @@
       ],
       "Hash": "b20bb09ceef690842b44585ef49db74e"
     },
+    "rsparse": {
+      "Package": "rsparse",
+      "Version": "0.5.1",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "Matrix",
+        "MatrixExtra",
+        "R",
+        "Rcpp",
+        "RcppArmadillo",
+        "RhpcBLASctl",
+        "data.table",
+        "float",
+        "lgr",
+        "methods"
+      ],
+      "Hash": "42dda788315ed0b1c53b66aaba40af30"
+    },
     "rstudioapi": {
       "Package": "rstudioapi",
       "Version": "0.15.0",
@@ -1329,6 +1419,26 @@
         "utils"
       ],
       "Hash": "04411ae66ab4659230c067c32966fc20"
+    },
+    "text2vec": {
+      "Package": "text2vec",
+      "Version": "0.6.3",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "Matrix",
+        "R",
+        "R6",
+        "Rcpp",
+        "data.table",
+        "digest",
+        "lgr",
+        "methods",
+        "mlapi",
+        "rsparse",
+        "stringi"
+      ],
+      "Hash": "9d190b0838d150daba133a9963e282fd"
     },
     "textrecipes": {
       "Package": "textrecipes",
@@ -1641,6 +1751,21 @@
         "workflows"
       ],
       "Hash": "7393bad2a9c83d549e79bd641f6bf67a"
+    },
+    "xgboost": {
+      "Package": "xgboost",
+      "Version": "2.0.0.1",
+      "Source": "Local",
+      "RemoteType": "local",
+      "RemoteUrl": "./xgboost_r_gpu_linux_096047c547aa71af7d53a507cecdd2a1d3124651.tar.gz",
+      "Requirements": [
+        "Matrix",
+        "R",
+        "data.table",
+        "jsonlite",
+        "methods"
+      ],
+      "Hash": "43b3876928ae3743d6a32e19c3d4d48e"
     },
     "yaml": {
       "Package": "yaml",

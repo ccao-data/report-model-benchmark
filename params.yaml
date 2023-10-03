@@ -2,6 +2,9 @@ machine: "ccao"
 note: >
   Initial test
 
+run_cpu: true
+run_gpu: true
+
 cv:
   split_prop: 0.9
   initial_set: 25
@@ -141,6 +144,13 @@ model:
       "meta_sale_document_num"
     ]
 
+    hash_cat: [
+      "meta_nbhd_code",
+      "loc_cook_municipality_name",
+      "loc_school_elementary_district_geoid",
+      "loc_school_secondary_district_geoid"
+    ]
+
   lightgbm:
     engine: "lightgbm"
     objective: "rmse"
@@ -148,11 +158,12 @@ model:
     verbose: 2
 
     parameter:
-      num_iterations: 10
-      learning_rate: 0.025
+      num_iterations: 1500
+      learning_rate: 0.04
       link_max_depth: TRUE
       max_bin: 512
       stop_iter: 40
+      num_terms: 12
 
       validation_prop: 0
       validation_type: "recent"
@@ -168,5 +179,22 @@ model:
       min_data_per_group: 75
       cat_smooth: 40.0
       cat_l2: 1.00
+      lambda_l1: 0.124
+      lambda_l2: 1.655
+
+  xgboost:
+    engine: "xgboost"
+    objective: "reg:squarederror"
+    seed: 2023
+    verbose: 2
+
+    parameter:
+      trees: 1500
+      learn_rate: 0.04
+      num_terms: 12
+
+    hyperparameter:
+      min_n: 4
+      mtry: 0.7
       lambda_l1: 0.124
       lambda_l2: 1.655

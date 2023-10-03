@@ -18,6 +18,7 @@ suppressPackageStartupMessages({
   library(tictoc)
   library(tidymodels)
   library(vctrs)
+  library(xgboost)
   library(yaml)
 })
 
@@ -62,10 +63,9 @@ assessment_data <- as_tibble(read_parquet("input/assessment_data.parquet"))
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # 3. LightGBM Models -----------------------------------------------------------
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-message("Initializing LightGBM models")
-
 
 ## 3.1. Initialize Models ------------------------------------------------------
+message("Initializing LightGBM models")
 
 # Gather lightgbm model-specific parameters
 lgbm_params <- params$model$lightgbm
@@ -137,28 +137,22 @@ lgbm_wflow_cpu <- workflow() %>%
   )
 
 # Run the benchmark workflow for CPU model
-get_timings(
-  machine = params$machine,
-  model_type = "lightgbm",
-  device_type = "cpu",
-  workflow = lgbm_wflow_cpu,
-  recipe = lgbm_recipe_cpu,
-  training_data = train,
-  test_data = test,
-  full_data = training_data_full,
-  assessment_data = assessment_data
-)
+if (params$run_cpu) {
+  get_timings(
+    machine = params$machine,
+    model_type = "lightgbm",
+    device_type = "cpu",
+    workflow = lgbm_wflow_cpu,
+    recipe = lgbm_recipe_cpu,
+    training_data = train,
+    test_data = test,
+    full_data = training_data_full,
+    assessment_data = assessment_data
+  )
+}
 
 
 ## 3.3. GPU Model --------------------------------------------------------------
-
-# Create a list of categoricals to hash for GPU compatibility
-lgbm_gpu_dummy_cats <- c(
-  "meta_nbhd_code",
-  "loc_cook_municipality_name",
-  "loc_school_elementary_district_geoid",
-  "loc_school_secondary_district_geoid"
-)
 
 # Create a GPU-model-specific recipe that randomly distributes categoricals
 # into separate pools. This is to get around lightgbm GPU specific bugs related
@@ -166,10 +160,17 @@ lgbm_gpu_dummy_cats <- c(
 lgbm_recipe_gpu <- lgbm_recipe %>%
   step_novel(all_of(params$model$predictor$categorical), -has_role("ID")) %>%
   step_unknown(all_of(params$model$predictor$categorical), -has_role("ID")) %>%
-  textrecipes::step_dummy_hash(all_of(lgbm_gpu_dummy_cats), num_terms = 24) %>%
+  textrecipes::step_dummy_hash(
+    all_of(params$model$predictor$hash_cat),
+    num_terms = params$model$lightgbm$parameter$num_terms
+  ) %>%
   step_integer(
-    all_of(setdiff(params$model$predictor$categorical, lgbm_gpu_dummy_cats)),
-    strict = TRUE, zero_based = TRUE
+    all_of(setdiff(
+      params$model$predictor$categorical,
+      params$model$predictor$hash_cat
+    )),
+    strict = TRUE,
+    zero_based = TRUE
   )
 
 # Create a GPU-model-specific workflow to use for fitting and prediction. This
@@ -182,7 +183,7 @@ lgbm_wflow_gpu <- workflow() %>%
         device = "gpu",
         categorical_feature = setdiff(
           lgbm_params$predictor$categorical,
-          lgbm_gpu_dummy_cats
+          params$model$predictor$hash_cat
         )
       )
   ) %>%
@@ -192,14 +193,116 @@ lgbm_wflow_gpu <- workflow() %>%
   )
 
 # Run the benchmark workflow for GPU model
-get_timings(
-  machine = params$machine,
-  model_type = "lightgbm",
-  device_type = "gpu",
-  workflow = lgbm_wflow_gpu,
-  recipe = lgbm_recipe_gpu,
-  training_data = train,
-  test_data = test,
-  full_data = training_data_full,
-  assessment_data = assessment_data
-)
+if (params$run_gpu) {
+  get_timings(
+    machine = params$machine,
+    model_type = "lightgbm",
+    device_type = "gpu",
+    workflow = lgbm_wflow_gpu,
+    recipe = lgbm_recipe_gpu,
+    training_data = train,
+    test_data = test,
+    full_data = training_data_full,
+    assessment_data = assessment_data
+  )
+}
+
+
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# 4. XGBoost Models ------------------------------------------------------------
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+## 4.1. Initialize Models ------------------------------------------------------
+message("Initializing XGBoost models")
+
+# Gather xgboost model-specific parameters
+xgbm_params <- params$model$xgboost
+
+# Initialize an xgboost model specification shared between different benchmarks
+xgbm_model <- parsnip::boost_tree(
+  trees = xgbm_params$parameter$trees,
+  learn_rate = xgbm_params$parameter$learn_rate,
+  min_n = xgbm_params$hyperparameter$min_n,
+  mtry = xgbm_params$hyperparameter$mtry
+) %>%
+  set_mode("regression") %>%
+  set_engine(
+    engine = xgbm_params$engine,
+    objective = xgbm_params$objective,
+    nthread = num_threads,
+    verbose = xgbm_params$verbose,
+    alpha  = xgbm_params$hyperparameter$lambda_l1,
+    lambda = xgbm_params$hyperparameter$lambda_l2,
+    counts = FALSE
+  )
+
+# Create a shared xgboost recipe that converts categoricals to one-hot or
+# hashed categories, depending on the number of levels in each categorical
+xgbm_recipe <- lgbm_recipe %>%
+  step_novel(all_of(params$model$predictor$categorical), -has_role("ID")) %>%
+  step_unknown(all_of(params$model$predictor$categorical), -has_role("ID")) %>%
+  textrecipes::step_dummy_hash(
+    all_of(params$model$predictor$hash_cat),
+    num_terms = params$model$xgboost$parameter$num_terms
+  ) %>%
+  step_dummy(
+    all_of(setdiff(
+      params$model$predictor$categorical,
+      params$model$predictor$hash_cat
+    ))
+  ) %>%
+  step_integer(where(is.logical))
+
+
+## 4.2. CPU Model --------------------------------------------------------------
+
+# Create a CPU-model-specific workflow to use for fitting and prediction
+xgbm_wflow_cpu <- workflow() %>%
+  add_model(xgbm_model) %>%
+  add_recipe(
+    recipe = xgbm_recipe,
+    blueprint = hardhat::default_recipe_blueprint(allow_novel_levels = TRUE)
+  )
+
+# Run the benchmark workflow for CPU model
+if (params$run_cpu) {
+  get_timings(
+    machine = params$machine,
+    model_type = "xgboost",
+    device_type = "cpu",
+    workflow = xgbm_wflow_cpu,
+    recipe = xgbm_recipe,
+    training_data = train,
+    test_data = test,
+    full_data = training_data_full,
+    assessment_data = assessment_data
+  )
+}
+
+
+## 4.3. GPU Model --------------------------------------------------------------
+
+# Create a GPU-model-specific workflow to use for fitting and prediction. This
+# must specify the device type and tree method as engine arguments
+xgbm_wflow_gpu <- workflow() %>%
+  add_model(xgbm_model %>% set_args(device = "cuda", tree_method = "hist")) %>%
+  add_recipe(
+    recipe = xgbm_recipe,
+    blueprint = hardhat::default_recipe_blueprint(allow_novel_levels = TRUE)
+  )
+
+# Run the benchmark workflow for GPU model
+if (params$run_gpu) {
+  get_timings(
+    machine = params$machine,
+    model_type = "lightgbm",
+    device_type = "gpu",
+    workflow = xgbm_wflow_gpu,
+    recipe = xgbm_recipe,
+    training_data = train,
+    test_data = test,
+    full_data = training_data_full,
+    assessment_data = assessment_data
+  )
+}
