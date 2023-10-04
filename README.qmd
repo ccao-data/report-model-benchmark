@@ -1,60 +1,90 @@
 ---
-title: "Model Benchmark"
 format: gfm
 ---
 
-This repository compares 
+This repository compares the time-to-train of two gradient-boosted decision tree (GBDT) frameworks - LightGBM and XGBoost - across different hardware. The purpose of this comparison is to help the CCAO decide which framework to use  
 
 - Comparing performance
 - Comparing hardware
 - Model switch decision
 - Purchasing decision
 
+- Show params
+- Tasks
+  - Train using N sales, predict on test (perf numbers)
+  - Time to train full set
+  - Time to predict N rows
+  - Time to calc N shaps
+
 ```{r setup, echo=FALSE, message=FALSE}
+library(arrow)
 library(dplyr)
 library(gt)
+library(purrr)
 library(readr)
 
-# Load manually created notes
-model_specs <- read_csv("model_specs.csv") %>%
+model_specs <- read_csv("input/model_specs.csv") %>%
   mutate(
     across(starts_with("Approx") & where(is.character), ~ parse_number(.x))
   ) %>%
-  select(Key:`Approx. Peak Memory Utilization`, Notes)
+  select(Key:`Approx. Peak Device Utilization`)
 
-# Load model performance
+perf_df <- map_dfr(
+  list.files("output/performance", pattern = "*.parquet", full.names = TRUE),
+  read_parquet
+)
 
-# Load model timing
+time_df <- map_dfr(
+  list.files("output/timing", pattern = "*.parquet", full.names = TRUE),
+  read_parquet
+) %>%
+  select(-c(tic, toc)) %>%
+  tidyr::pivot_wider(id_cols = run_id, names_from = stage, values_from = time)
 
-
+full_data <- model_specs %>%
+  left_join(time_df, by = c("Key" = "run_id")) %>%
+  left_join(perf_df, by = c("Key" = "run_id")) %>%
+  select(-c(Key, time)) %>%
+  rename(
+    `Wall Time (Full Run)` = train,
+    `Wall Time (Prediction)` = predict,
+    `Wall Time (SHAP)` = shap,
+    r2 = rsq
+  ) %>%
+  rename_with(toupper, rmse:mki) %>%
+  mutate(
+    `Approx. Peak Device Utilization` = `Approx. Peak Device Utilization` / 100,
+    MAPE = MAPE / 100
+  )
 ```
 
 ```{r create_table, echo=FALSE, message=FALSE}
+full_data %>%
 gt() %>%
-  tab_header(
-    title = "Model Benchmark",
-    subtitle = "LightGBM CPU/GPU vs XGBoost CPU/GPU"
-  ) %>%
+  tab_header(title = "LightGBM CPU/GPU vs XGBoost CPU/GPU") %>%
   tab_footnote(
     footnote = paste(
       "Categoricals with over 50 values are hashed,",
       "otherwise one-hot encoded"
     ),
-    locations = cells_body(Type, c(2, 4, 6))
+    locations = cells_body(Type, c(3, 7, 8))
   ) %>%
   tab_footnote(
     footnote = paste(
       "Categoricals with over 50 values are hashed,",
-      "otherwise native (untouched)"
+      "otherwise native (un touched)"
     ),
-    locations = cells_body(Type, 5)
+    locations = cells_body(Type, 6)
   ) %>%
-  fmt_percent(starts_with("Approx.")) %>%
+  fmt_percent(starts_with("Approx."), decimals = 0) %>%
+  fmt_percent(MAPE, decimals = 2) %>%
   fmt_duration(
     starts_with("Wall Time"),
     input_units = "seconds",
     output_units = c("hours", "minutes", "seconds")
   ) %>%
-  fmt_currency(contains("RMSE"), decimals = 2)
+  fmt_currency(c(contains("RMSE"), contains("MAE")), decimals = 0) %>%
+  fmt_number(R2:MKI, decimal = 3) %>%
+  tab_style(style = cell_text(weight = "bold"), cells_title()) %>%
+  tab_style(style = cell_text(weight = "bold"), cells_column_labels())
 ```
-
