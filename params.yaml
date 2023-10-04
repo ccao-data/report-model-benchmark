@@ -3,7 +3,7 @@ run_cpu: true
 run_gpu: false
 
 model:
-  n_shap: 5000
+  n_shap: 50000
   split_prop: 0.9
 
   predictor:
