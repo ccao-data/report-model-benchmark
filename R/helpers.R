@@ -10,7 +10,8 @@ get_timings <- function(machine,
                         n_shap = 1000
                         ) {
 
-  run_id = glue("{machine}-{model_type}-{device_type}")
+  model_version <- packageVersion(model_type)
+  run_id = glue("{machine}-{model_type}-{model_version}-{device_type}")
 
   # Fit model on training data and evaluate performance on holdout set
   message(glue("Fitting {run_id} on training data"))
