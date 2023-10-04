@@ -60,13 +60,18 @@ get_timings <- function(machine,
   # Predict SHAP values and gather timings
   message(glue("Predicting SHAPs for {run_id}"))
   tictoc::tic(glue("{run_id}_shap"))
-  predict(
-    wflow_full_fit %>% extract_fit_engine(),
-    assessment_data_prepped %>%
-      dplyr::slice(seq_len(n_shap)) %>%
-      as.matrix(),
-    type = "contrib"
-  )
+
+  wflow_eng_fit <- wflow_full_fit %>% extract_fit_engine()
+  shap_slice <- assessment_data_prepped %>%
+    dplyr::slice(seq_len(n_shap)) %>%
+    as.matrix()
+
+  if (model_type == "lightgbm" & model_version > "3.3.5") {
+    predict(wflow_eng_fit, shap_slice, type = "contrib")
+  } else {
+    predict(wflow_eng_fit, shap_slice, predcontrib = TRUE)
+  }
+
   tictoc::toc(log = TRUE)
 
   # Save run timing logs to file
