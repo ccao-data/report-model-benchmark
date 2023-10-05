@@ -27,9 +27,7 @@ walk(list.files("R/", "\\.R$", full.names = TRUE), source)
 
 # Load the parameters file containing the benchmark settings
 params <- read_yaml("params.yaml")
-
-# Get the number of available physical cores to use for multi-threading
-num_threads <- parallel::detectCores(logical = FALSE)
+num_threads <- params$model$n_threads
 set.seed(params$model$seed)
 
 

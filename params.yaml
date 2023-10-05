@@ -5,6 +5,7 @@ run_gpu: false
 model:
   n_shap: 50000
   split_prop: 0.9
+  n_threads: 16
 
   predictor:
     all: [
