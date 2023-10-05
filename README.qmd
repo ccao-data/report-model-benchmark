@@ -1,4 +1,5 @@
 ---
+title: Model Benchmark
 format: gfm
 ---
 
@@ -11,7 +12,7 @@ Below are the results of our tests.
 
 > ***:warning: Please note that the performance statistics presented here are only for cross-model comparison and do not reflect any real model results e.g. they are included only to show that each GBDT framework and version generates similar results, given the same data.***
 
-<h2 id="results">LightGBM CPU/GPU vs XGBoost CPU/GPU</h2>
+## Results
 
 ```{r setup, echo=FALSE, message=FALSE}
 library(arrow)
@@ -99,7 +100,7 @@ These tests were run on two different machines: an on-prem modeling server used 
 | **OS**       | Ubuntu 22.04 LTS                         | Ubuntu 22.04 LTS                       |
 | **Compiler** | gcc (11.4.0) -O3 -march=native           | gcc (11.4.0) -O3 -march=native         |
 
-### Tasks
+## Tasks
 
 The tasks performed for this benchmark (outlined in the table above) are as follows:
 
@@ -108,7 +109,7 @@ The tasks performed for this benchmark (outlined in the table above) are as foll
 - **SHAP** - The trained model is used to predict SHAP values for the first 50K rows of assessment data.
 - For performance metrics, the model is trained on a training set, then predicts on a holdout test set. Performance is calculated using the test set predictions.
 
-### Inputs
+## Inputs
 
 The benchmark uses the following inputs:
 

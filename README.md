@@ -1,3 +1,5 @@
+Model Benchmark
+================
 
 This repository compares the time-to-train of two gradient-boosted
 decision tree (GBDT) frameworks - LightGBM and XGBoost - across
@@ -16,9 +18,7 @@ Below are the results of our tests.
 > framework and version generates similar results, given the same
 > data.***
 
-<h2 id="results">
-LightGBM CPU/GPU vs XGBoost CPU/GPU
-</h2>
+## Results
 
 | Server | Type                                                                                                                         | Device | Package Version | Peak Device Utilization | Wall Time (Full Run) | Wall Time (Prediction) | Wall Time (SHAP) | RMSE      | MAE      | MAPE   | R2    | COD    | PRD   | PRB    | MKI   |
 |:-------|:-----------------------------------------------------------------------------------------------------------------------------|:-------|:----------------|------------------------:|---------------------:|-----------------------:|-----------------:|:----------|:---------|:-------|:------|:-------|:------|:-------|:------|
@@ -51,7 +51,7 @@ machines have the following specifications:
 | **OS**       | Ubuntu 22.04 LTS                         | Ubuntu 22.04 LTS                       |
 | **Compiler** | gcc (11.4.0) -O3 -march=native           | gcc (11.4.0) -O3 -march=native         |
 
-### Tasks
+## Tasks
 
 The tasks performed for this benchmark (outlined in the table above) are
 as follows:
@@ -66,7 +66,7 @@ as follows:
   predicts on a holdout test set. Performance is calculated using the
   test set predictions.
 
-### Inputs
+## Inputs
 
 The benchmark uses the following inputs:
 
