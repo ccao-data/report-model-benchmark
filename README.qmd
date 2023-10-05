@@ -2,19 +2,12 @@
 format: gfm
 ---
 
-This repository compares the time-to-train of two gradient-boosted decision tree (GBDT) frameworks - LightGBM and XGBoost - across different hardware. The purpose of this comparison is to help the CCAO decide which framework to use  
+This repository compares the time-to-train of two gradient-boosted decision tree (GBDT) frameworks - LightGBM and XGBoost - across different hardware and versions. The purpose of this comparison is to help the CCAO make two decisions:
 
-- Comparing performance
-- Comparing hardware
-- Model switch decision
-- Purchasing decision
+1. Which GBDT framework to use for its 2024 automated valuation models
+2. Whether or not to purchase additional hardware (a GPU) in order to improve model training speed
 
-- Show params
-- Tasks
-  - Train using N sales, predict on test (perf numbers)
-  - Time to train full set
-  - Time to predict N rows
-  - Time to calc N shaps
+Below are the results of our tests. ***Please note that the performance statistics presented here are only for cross-model comparison and do not reflect any real model results.*** They are basically included to show that each framework and version generates similar results, given the same data.
 
 ```{r setup, echo=FALSE, message=FALSE}
 library(arrow)
@@ -88,3 +81,20 @@ gt() %>%
   tab_style(style = cell_text(weight = "bold"), cells_title()) %>%
   tab_style(style = cell_text(weight = "bold"), cells_column_labels())
 ```
+
+
+- Comparing hardware
+- Model switch decision
+- Purchasing decision
+
+- populate input data
+
+- Show params
+- Tasks
+  - Train using N sales, predict on test (perf numbers)
+  - Time to train full set
+  - Time to predict N rows
+  - Time to calc N shaps
+  
+  
+- Time savings calculation
