@@ -67,9 +67,13 @@ get_timings <- function(machine,
     as.matrix()
 
   if (model_type == "lightgbm" & model_version > "3.3.5") {
-    predict(wflow_eng_fit, shap_slice, type = "contrib")
+    predict(wflow_eng_fit, shap_slice, type = "contrib") %>%
+      as_tibble(.name_repair = "unique") %>%
+      arrow::write_parquet(glue("output/shap/{run_id}.parquet"))
   } else {
-    predict(wflow_eng_fit, shap_slice, predcontrib = TRUE)
+    predict(wflow_eng_fit, shap_slice, predcontrib = TRUE) %>%
+      as_tibble(.name_repair = "unique") %>%
+      arrow::write_parquet(glue("output/shap/{run_id}.parquet"))
   }
 
   tictoc::toc(log = TRUE)
