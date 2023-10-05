@@ -53,8 +53,8 @@ machines have the following specifications:
 
 ## Tasks
 
-The tasks performed for this benchmark (outlined in the table above) are
-as follows:
+The tasks performed for this benchmark (as shown in the results table)
+are as follows:
 
 - **Full Run** - The model is trained on the training + test set, to be
   used for prediction on unseen data.
