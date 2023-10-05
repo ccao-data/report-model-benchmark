@@ -7,12 +7,13 @@ This repository compares the time-to-train of two gradient-boosted decision tree
 1. Which GBDT framework to use for its 2024 automated valuation models
 2. Whether or not to purchase additional hardware (a GPU) in order to improve model training speed
 
-Below are the results of our tests. ***Please note that the performance statistics presented here are only for cross-model comparison and do not reflect any real model results.*** They are basically included to show that each framework and version generates similar results, given the same data.
+Below are the results of our tests. ***Please note that the performance statistics presented here are only for cross-model comparison and do not reflect any real model results e.g. they are included only to show that each framework and version generates similar results, given the same data.***
 
 ```{r setup, echo=FALSE, message=FALSE}
 library(arrow)
 library(dplyr)
 library(gt)
+library(kableExtra)
 library(purrr)
 library(readr)
 
@@ -53,22 +54,11 @@ full_data <- model_specs %>%
 
 ```{r create_table, echo=FALSE, message=FALSE}
 full_data %>%
+  select(-`Hardware Specifications`) %>%
 gt() %>%
   tab_header(title = "LightGBM CPU/GPU vs XGBoost CPU/GPU") %>%
-  tab_footnote(
-    footnote = paste(
-      "Categoricals with over 50 values are hashed,",
-      "otherwise one-hot encoded"
-    ),
-    locations = cells_body(Type, c(3, 7, 8))
-  ) %>%
-  tab_footnote(
-    footnote = paste(
-      "Categoricals with over 50 values are hashed,",
-      "otherwise native (un touched)"
-    ),
-    locations = cells_body(Type, 6)
-  ) %>%
+  tab_footnote(footnote = "1", locations = cells_body(Type, c(3, 7, 8))) %>%
+  tab_footnote(footnote = "2", locations = cells_body(Type, 6)) %>%
   fmt_percent(starts_with("Approx."), decimals = 0) %>%
   fmt_percent(MAPE, decimals = 2) %>%
   fmt_duration(
@@ -79,13 +69,18 @@ gt() %>%
   fmt_currency(c(contains("RMSE"), contains("MAE")), decimals = 0) %>%
   fmt_number(R2:MKI, decimal = 3) %>%
   tab_style(style = cell_text(weight = "bold"), cells_title()) %>%
-  tab_style(style = cell_text(weight = "bold"), cells_column_labels())
+  tab_style(style = cell_text(weight = "bold"), cells_column_labels()) %>%
+  extract_body() %>%
+  mutate(across(starts_with("Wall Time"), ~ gsub(" ", "&#160;", .x))) %>%
+  rename(`Wall Time (Full&#160;Run)` = `Wall Time (Full Run)`) %>%
+  knitr::kable(format = "markdown", align = "llllrrrrllllll")
 ```
 
+### Hardware
 
-- Comparing hardware
-- Model switch decision
-- Purchasing decision
+### Tasks
+
+### Input data and parameters
 
 - populate input data
 
