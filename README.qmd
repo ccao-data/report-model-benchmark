@@ -7,7 +7,11 @@ This repository compares the time-to-train of two gradient-boosted decision tree
 1. Which GBDT framework to use for its 2024 automated valuation models
 2. Whether or not to purchase additional hardware (a GPU) in order to improve model training speed
 
-Below are the results of our tests. ***Please note that the performance statistics presented here are only for cross-model comparison and do not reflect any real model results e.g. they are included only to show that each framework and version generates similar results, given the same data.***
+Below are the results of our tests. 
+
+> ***:warning: Please note that the performance statistics presented here are only for cross-model comparison and do not reflect any real model results e.g. they are included only to show that each GBDT framework and version generates similar results, given the same data.***
+
+<h2 id="results">LightGBM CPU/GPU vs XGBoost CPU/GPU</h2>
 
 ```{r setup, echo=FALSE, message=FALSE}
 library(arrow)
@@ -71,25 +75,44 @@ gt() %>%
   tab_style(style = cell_text(weight = "bold"), cells_title()) %>%
   tab_style(style = cell_text(weight = "bold"), cells_column_labels()) %>%
   extract_body() %>%
+  # Replacing with non-line-break space characters for better formatting
   mutate(across(starts_with("Wall Time"), ~ gsub(" ", "&#160;", .x))) %>%
-  rename(`Wall Time (Full&#160;Run)` = `Wall Time (Full Run)`) %>%
+  rename(
+    `Wall&#160;Time (Full&#160;Run)` = `Wall Time (Full Run)`,
+    `Peak&#160;Device Utilization` = `Approx. Peak Device Utilization`
+  ) %>%
   knitr::kable(format = "markdown", align = "llllrrrrllllll")
 ```
 
-### Hardware
+1. Categoricals with over 50 values are hashed, otherwise one-hot encoded.
+2. Categoricals with over 50 values are hashed, otherwise natively handled.
+
+## Hardware
+
+These tests were run on two different machines: an on-prem modeling server used by the CCAO and a test server provided by NVIDIA via the [LaunchPad](https://www.nvidia.com/en-us/launchpad/) program. The machines have the following specifications:
+
+|              | CCAO                                     | NVIDIA                                 |
+|--------------|------------------------------------------|----------------------------------------|
+| **CPU**      | Xeon Silver 4208 CPU @ 2.10GHz, 16 cores | Xeon Gold 6354 CPU @ 3.00GHz, 72 cores |
+| **Memory**   | 128GiB                                   | 512GiB                                 |
+| **GPU**      | -                                        | NVIDIA A40, 48GB                       |
+| **OS**       | Ubuntu 22.04 LTS                         | Ubuntu 22.04 LTS                       |
+| **Compiler** | gcc (11.4.0) -O3 -march=native           | gcc (11.4.0) -O3 -march=native         |
 
 ### Tasks
 
-### Input data and parameters
+The tasks performed for this benchmark (outlined in the table above) are as follows:
 
-- populate input data
+- **Full Run** - The model is trained on the training + test set, to be used for prediction on unseen data.
+- **Prediction** - The trained model is used to predict on the assessment data.
+- **SHAP** - The trained model is used to predict SHAP values for the first 50K rows of assessment data.
+- For performance metrics, the model is trained on a training set, then predicts on a holdout test set. Performance is calculated using the test set predictions.
 
-- Show params
-- Tasks
-  - Train using N sales, predict on test (perf numbers)
-  - Time to train full set
-  - Time to predict N rows
-  - Time to calc N shaps
-  
-  
-- Time savings calculation
+### Inputs
+
+The benchmark uses the following inputs:
+
+- Input data from the 2023 CCAO residential valuation model:
+  - [`input/training_data.parquet`](https://ccao-data-public-us-east-1.s3.amazonaws.com/models/inputs/res/2023/training_data.parquet) - 424,950 rows
+  - [`input/assessment_data.parquet`](https://ccao-data-public-us-east-1.s3.amazonaws.com/models/inputs/res/2023/assessment_data.parquet) - 1,099,226 rows
+- (Hyper)parameters used for this benchmark can be found in [`params.yaml`](./params.yaml)
