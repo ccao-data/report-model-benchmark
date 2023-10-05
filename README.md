@@ -12,11 +12,12 @@ help the CCAO make two decisions:
 
 Below are the results of our tests.
 
-> ***:warning: Please note that the performance statistics presented
-> here are only for cross-model comparison and do not reflect any real
-> model results e.g. they are included only to show that each GBDT
-> framework and version generates similar results, given the same
-> data.***
+> :warning: **NOTE:**
+>
+> Please note that the performance statistics presented here are only
+> for cross-model comparison and do not reflect any real model results
+> e.g. they are included only to show that each GBDT framework and
+> version generates similar results, given the same data.
 
 ## Results
 
