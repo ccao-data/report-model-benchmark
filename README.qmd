@@ -148,6 +148,7 @@ est_costs <- full_data %>%
   ) %>%
   select(
     Server:Device,
+    `Instance Type` = instance,
     `Est. Time Per Run` = time_total,
     `Est. Cost Per Run` = cpr,
     `Est. Total 2024 Cost` = tot_cost
@@ -170,7 +171,16 @@ gt() %>%
   ) %>%
   fmt_currency(contains("Cost"), decimals = 2) %>%
   extract_body() %>%
-  knitr::kable(format = "markdown", align = "lllrrr")
+  mutate(
+    across(everything(), ~ tidyr::replace_na(.x, "-")),
+    across(everything(), ~ replace(.x, .x == "NA", "-"))
+  ) %>%
+  rename(
+    `Est.&#160;Time Per&#160;Run` = `Est. Time Per Run`,
+    `Est.&#160;Cost Per&#160;Run` = `Est. Cost Per Run`,
+    `Est.&#160;Total 2024&#160;Cost` = `Est. Total 2024 Cost`
+  ) %>%
+  knitr::kable(format = "markdown", align = "llllrrr")
 ```
 
 1. Estimate assumes a fixed cost for an NVIDIA A40 of `r scales::dollar(a40_cost)`.

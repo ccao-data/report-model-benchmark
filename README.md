@@ -43,13 +43,13 @@ Below are the results of our tests:
 
 ## Cost estimates
 
-| Server                                                                                                                     | Type     | Device | Est. Time Per Run | Est. Cost Per Run | Est. Total 2024 Cost |
-|:---------------------------------------------------------------------------------------------------------------------------|:---------|:-------|------------------:|------------------:|---------------------:|
-| CCAO                                                                                                                       | LightGBM | CPU    |        57h 55m 5s |                NA |                   NA |
-| CCAO                                                                                                                       | XGBoost  | CPU    |        9h 25m 14s |                NA |                   NA |
-| NVIDIA<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span> | XGBoost  | GPU    |        3h 54m 34s |           \$35.00 |           \$7,000.00 |
-| AWS<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>2</sup></span>    | XGBoost  | GPU    |        4h 54m 10s |            \$7.96 |           \$1,592.48 |
-| AWS<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>2</sup></span>    | XGBoost  | GPU    |        4h 54m 10s |            \$3.29 |             \$658.56 |
+| Server                                                                                                                     | Type     | Device | Instance Type | Est. Time Per Run | Est. Cost Per Run | Est. Total 2024 Cost |
+|:---------------------------------------------------------------------------------------------------------------------------|:---------|:-------|:--------------|------------------:|------------------:|---------------------:|
+| CCAO                                                                                                                       | LightGBM | CPU    | \-            |        57h 55m 5s |                \- |                   \- |
+| CCAO                                                                                                                       | XGBoost  | CPU    | \-            |        9h 25m 14s |                \- |                   \- |
+| NVIDIA<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span> | XGBoost  | GPU    | \-            |        3h 54m 34s |           \$35.00 |           \$7,000.00 |
+| AWS<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>2</sup></span>    | XGBoost  | GPU    | Normal        |        4h 54m 10s |            \$7.96 |           \$1,592.48 |
+| AWS<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>2</sup></span>    | XGBoost  | GPU    | Spot          |        4h 54m 10s |            \$3.29 |             \$658.56 |
 
 1.  Estimate assumes a fixed cost for an NVIDIA A40 of \$7,000.
 2.  Estimates use AWS costs for `g5.4xlarge` instances created
