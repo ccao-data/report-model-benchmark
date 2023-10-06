@@ -8,11 +8,11 @@ This repository compares the time-to-train of two gradient-boosted decision tree
 1. Which GBDT framework to use for its 2024 automated valuation models
 2. Whether or not to purchase or rent additional hardware (a GPU) in order to improve model training speed
 
-Below are the results of our tests.
+Below are the results of our tests:
 
 > :warning: **NOTE:**
 >
-> Please note that the performance statistics presented here are only for cross-model comparison and do not reflect any real model results e.g. they are included only to show that each GBDT framework and version generates similar results, given the same data.
+> The performance statistics presented here are only for cross-model comparison and do not reflect any real model results e.g. they are included only to show that each GBDT framework and version generates similar results, given the same data.
 
 ## Results
 
@@ -63,9 +63,11 @@ full_data <- model_specs %>%
 full_data %>%
   select(-`Hardware Specifications`) %>%
 gt() %>%
-  tab_header(title = "LightGBM CPU/GPU vs XGBoost CPU/GPU") %>%
-  tab_footnote(footnote = "1", locations = cells_body(Type, c(3, 7, 8))) %>%
-  tab_footnote(footnote = "2", locations = cells_body(Type, 6)) %>%
+  tab_footnote(
+    footnote = "1",
+    locations = cells_body(Type, c(3, 7, 8, 11, 12))
+  ) %>%
+  tab_footnote(footnote = "2", locations = cells_body(Type, c(6, 10))) %>%
   fmt_percent(starts_with("Approx."), decimals = 0) %>%
   fmt_percent(MAPE, decimals = 2) %>%
   fmt_duration(
@@ -75,8 +77,6 @@ gt() %>%
   ) %>%
   fmt_currency(c(contains("RMSE"), contains("MAE")), decimals = 0) %>%
   fmt_number(R2:MKI, decimal = 3) %>%
-  tab_style(style = cell_text(weight = "bold"), cells_title()) %>%
-  tab_style(style = cell_text(weight = "bold"), cells_column_labels()) %>%
   extract_body() %>%
   # Replacing with non-line-break space characters for better formatting
   mutate(across(starts_with("Wall Time"), ~ gsub(" ", "&#160;", .x))) %>%
@@ -84,11 +84,100 @@ gt() %>%
     `Wall&#160;Time (Full&#160;Run)` = `Wall Time (Full Run)`,
     `Peak&#160;Device Utilization` = `Approx. Peak Device Utilization`
   ) %>%
-  knitr::kable(format = "markdown", align = "llllrrrrllllll")
+  knitr::kable(format = "markdown", align = "llllrrrrrrrrrr")
 ```
 
 1. Categoricals with over 50 values are hashed, otherwise one-hot encoded.
 2. Categoricals with over 50 values are hashed, otherwise natively handled.
+
+## Cost estimates
+
+```{r costs, message=FALSE, echo=FALSE}
+# g5.4xlarge prices as of 2023-10-06 in us-east-1
+price_full <- 1.624
+price_spot <- 0.6716
+
+# Runs in this repo don't use early stopping, but most runs during CV will and
+# will thus train faster. Thus we multiply to get the typical num of iters
+# reached when stopping early
+early_stop_mult <- 0.8
+
+# Average number of CV iterations per run
+n_iters <- 60
+
+# Total number of folds per CV iteration
+n_folds <- floor((9 * 12) / 15)
+
+# Time per CV fold, based on proportion of the total training data relative
+# to a full run (all data)
+n_folds_mult <- seq_len(n_folds) / n_folds
+
+# Total number of runs per year
+n_runs <- 200
+
+# Estimated MSRP of an A40
+a40_cost <- 7000
+
+# Create an estimated cost table
+est_costs <- full_data %>%
+  slice(c(2, 3, 8, 12, 12)) %>%
+  bind_cols(tibble(instance = c(NA, NA, NA, "Normal", "Spot"))) %>%
+  rename(
+    time_run = `Wall Time (Full Run)`,
+    time_pred = `Wall Time (Prediction)`,
+    time_shap = `Wall Time (SHAP)`
+  ) %>%
+  rowwise() %>%
+  mutate(
+    time_cv = sum(time_run * n_folds_mult) * n_iters * early_stop_mult,
+    time_total = time_cv + time_pred + (time_shap * (1.1e6 / 50000)),
+  ) %>%
+  ungroup() %>%
+  mutate(
+    cpr = case_when(
+      Server == "NVIDIA" ~ a40_cost / n_runs,
+      Server == "AWS" & instance == "Normal" ~ (time_total / 3600) * price_full,
+      Server == "AWS" & instance == "Spot" ~ (time_total / 3600) * price_spot,
+      TRUE ~ NA_real_
+    ),
+    tot_cost = case_when(
+      Server == "NVIDIA" ~ a40_cost,
+      Server == "AWS" ~ cpr * n_runs,
+      TRUE ~ NA_real_
+    )
+  ) %>%
+  select(
+    Server:Device,
+    `Est. Time Per Run` = time_total,
+    `Est. Cost Per Run` = cpr,
+    `Est. Total 2024 Cost` = tot_cost
+  )
+
+est_costs %>%
+gt() %>%
+  tab_footnote(
+    footnote = "1",
+    locations = cells_body(`Server`, 3)
+  ) %>%
+  tab_footnote(
+    footnote = "2",
+    locations = cells_body(`Server`, 4:5)
+  ) %>%
+  fmt_duration(
+    `Est. Time Per Run`,
+    input_units = "seconds",
+    output_units = c("hours", "minutes", "seconds")
+  ) %>%
+  fmt_currency(contains("Cost"), decimals = 2) %>%
+  extract_body() %>%
+  knitr::kable(format = "markdown", align = "lllrrr")
+```
+
+1. Estimate assumes a fixed cost for an NVIDIA A40 of `r scales::dollar(a40_cost)`.
+2. Estimates use AWS costs for `g5.4xlarge` instances created ephemerally using AWS Batch + Fargate. As of 2023-10-06, costs are:
+    - Normal hourly pricing: `r scales::dollar(price_full)`
+    - Spot hourly pricing: `r scales::dollar(price_spot)`
+3. All estimates assume 200 total runs in 2024, costs per run decrease for the NVIDIA option as number of runs increases.
 
 ## Hardware
 

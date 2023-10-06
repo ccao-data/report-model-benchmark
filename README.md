@@ -10,19 +10,19 @@ help the CCAO make two decisions:
 2.  Whether or not to purchase or rent additional hardware (a GPU) in
     order to improve model training speed
 
-Below are the results of our tests.
+Below are the results of our tests:
 
 > :warning: **NOTE:**
 >
-> Please note that the performance statistics presented here are only
-> for cross-model comparison and do not reflect any real model results
-> e.g. they are included only to show that each GBDT framework and
-> version generates similar results, given the same data.
+> The performance statistics presented here are only for cross-model
+> comparison and do not reflect any real model results e.g. they are
+> included only to show that each GBDT framework and version generates
+> similar results, given the same data.
 
 ## Results
 
-| Server | Type                                                                                                                         | Device | Package Version | Peak Device Utilization | Wall Time (Full Run) | Wall Time (Prediction) | Wall Time (SHAP) | RMSE      | MAE      | MAPE   | R2    | COD    | PRD   | PRB    | MKI   |
-|:-------|:-----------------------------------------------------------------------------------------------------------------------------|:-------|:----------------|------------------------:|---------------------:|-----------------------:|-----------------:|:----------|:---------|:-------|:------|:-------|:------|:-------|:------|
+| Server | Type                                                                                                                         | Device | Package Version | Peak Device Utilization | Wall Time (Full Run) | Wall Time (Prediction) | Wall Time (SHAP) |      RMSE |      MAE |   MAPE |    R2 |    COD |   PRD | PRB    | MKI   |
+|:-------|:-----------------------------------------------------------------------------------------------------------------------------|:-------|:----------------|------------------------:|---------------------:|-----------------------:|-----------------:|----------:|---------:|-------:|------:|-------:|------:|:-------|:------|
 | CCAO   | LightGBM                                                                                                                     | CPU    | 3.3.5           |                    100% |               3m 55s |                  1m 5s |        2h 1m 38s | \$130,989 | \$74,124 | 26.97% | 0.883 | 27.634 | 1.140 | −0.225 | 0.851 |
 | CCAO   | LightGBM                                                                                                                     | CPU    | 4.1.0           |                    100% |                4m 8s |                  1m 4s |        2h 1m 48s | \$130,989 | \$74,124 | 26.97% | 0.883 | 27.634 | 1.140 | −0.225 | 0.851 |
 | CCAO   | XGBoost<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span>  | CPU    | 2.0.0.1         |                    100% |               2m 41s |                    12s |           2m 14s | \$126,389 | \$74,129 | 26.76% | 0.885 | 27.458 | 1.130 | −0.212 | 0.866 |
@@ -32,14 +32,32 @@ Below are the results of our tests.
 | NVIDIA | XGBoost<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span>  | CPU    | 2.0.0.1         |                    100% |               1m 25s |                     5s |              52s | \$126,894 | \$74,191 | 26.83% | 0.884 | 27.552 | 1.130 | −0.210 | 0.868 |
 | NVIDIA | XGBoost<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span>  | GPU    | 2.0.0.1         |                     92% |               1m 12s |                    13s |               5s | \$126,952 | \$74,124 | 26.78% | 0.885 | 27.515 | 1.130 | −0.213 | 0.867 |
 | AWS    | LightGBM                                                                                                                     | CPU    | 4.1.0.99        |                    100% |               2m 38s |                  1m 1s |       1h 45m 59s | \$130,989 | \$74,124 | 26.97% | 0.883 | 27.634 | 1.140 | −0.225 | 0.851 |
-| AWS    | LightGBM                                                                                                                     | GPU    | 4.1.0.99        |                      8% |               3m 56s |                 1m 10s |       1h 47m 19s | \$130,632 | \$74,210 | 27.18% | 0.884 | 27.866 | 1.143 | −0.230 | 0.847 |
-| AWS    | XGBoost                                                                                                                      | CPU    | 2.0.0.1         |                    100% |               1m 58s |                    11s |           1m 31s | \$125,867 | \$73,899 | 26.79% | 0.886 | 27.510 | 1.130 | −0.212 | 0.869 |
-| AWS    | XGBoost                                                                                                                      | GPU    | 2.0.0.1         |                     95% |               1m 31s |                    17s |               6s | \$126,679 | \$74,002 | 26.80% | 0.885 | 27.523 | 1.130 | −0.210 | 0.867 |
+| AWS    | LightGBM<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>2</sup></span> | GPU    | 4.1.0.99        |                      8% |               3m 56s |                 1m 10s |       1h 47m 19s | \$130,632 | \$74,210 | 27.18% | 0.884 | 27.866 | 1.143 | −0.230 | 0.847 |
+| AWS    | XGBoost<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span>  | CPU    | 2.0.0.1         |                    100% |               1m 58s |                    11s |           1m 31s | \$125,867 | \$73,899 | 26.79% | 0.886 | 27.510 | 1.130 | −0.212 | 0.869 |
+| AWS    | XGBoost<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span>  | GPU    | 2.0.0.1         |                     95% |               1m 31s |                    17s |               6s | \$126,679 | \$74,002 | 26.80% | 0.885 | 27.523 | 1.130 | −0.210 | 0.867 |
 
 1.  Categoricals with over 50 values are hashed, otherwise one-hot
     encoded.
 2.  Categoricals with over 50 values are hashed, otherwise natively
     handled.
+
+## Cost estimates
+
+| Server                                                                                                                     | Type     | Device | Est. Time Per Run | Est. Cost Per Run | Est. Total 2024 Cost |
+|:---------------------------------------------------------------------------------------------------------------------------|:---------|:-------|------------------:|------------------:|---------------------:|
+| CCAO                                                                                                                       | LightGBM | CPU    |        57h 55m 5s |                NA |                   NA |
+| CCAO                                                                                                                       | XGBoost  | CPU    |        9h 25m 14s |                NA |                   NA |
+| NVIDIA<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span> | XGBoost  | GPU    |        3h 54m 34s |           \$35.00 |           \$7,000.00 |
+| AWS<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>2</sup></span>    | XGBoost  | GPU    |        4h 54m 10s |            \$7.96 |           \$1,592.48 |
+| AWS<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>2</sup></span>    | XGBoost  | GPU    |        4h 54m 10s |            \$3.29 |             \$658.56 |
+
+1.  Estimate assumes a fixed cost for an NVIDIA A40 of \$7,000.
+2.  Estimates use AWS costs for `g5.4xlarge` instances created
+    ephemerally using AWS Batch + Fargate. As of 2023-10-06, costs are:
+    - Normal hourly pricing: \$1.62
+    - Spot hourly pricing: \$0.67
+3.  All estimates assume 200 total runs in 2024, costs per run decrease
+    for the NVIDIA option as number of runs increases.
 
 ## Hardware
 
