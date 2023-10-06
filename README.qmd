@@ -6,7 +6,7 @@ format: gfm
 This repository compares the time-to-train of two gradient-boosted decision tree (GBDT) frameworks - LightGBM and XGBoost - across different hardware and versions. The purpose of this comparison is to help the CCAO make two decisions:
 
 1. Which GBDT framework to use for its 2024 automated valuation models
-2. Whether or not to purchase additional hardware (a GPU) in order to improve model training speed
+2. Whether or not to purchase or rent additional hardware (a GPU) in order to improve model training speed
 
 Below are the results of our tests.
 
@@ -92,7 +92,7 @@ gt() %>%
 
 ## Hardware
 
-These tests were run on three different machines: an on-prem modeling server used by the CCAA, a test server provided by NVIDIA via the [LaunchPad](https://www.nvidia.com/en-us/launchpad/) program, and a standard AWS `g5.4xlarge` EC2 instance. The machines have the following specifications:
+These tests were run on three different machines: an on-prem modeling server used by the CCAO, a test server provided by NVIDIA via the [LaunchPad](https://www.nvidia.com/en-us/launchpad/) program, and a standard AWS `g5.4xlarge` EC2 instance. The machines have the following specifications:
 
 |              | CCAO                                     | NVIDIA                                 | g5.4xlarge                             |
 |--------------|------------------------------------------|----------------------------------------| ---------------------------------------|

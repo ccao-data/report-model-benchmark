@@ -7,8 +7,8 @@ different hardware and versions. The purpose of this comparison is to
 help the CCAO make two decisions:
 
 1.  Which GBDT framework to use for its 2024 automated valuation models
-2.  Whether or not to purchase additional hardware (a GPU) in order to
-    improve model training speed
+2.  Whether or not to purchase or rent additional hardware (a GPU) in
+    order to improve model training speed
 
 Below are the results of our tests.
 
@@ -27,10 +27,14 @@ Below are the results of our tests.
 | CCAO   | LightGBM                                                                                                                     | CPU    | 4.1.0           |                    100% |                4m 8s |                  1m 4s |        2h 1m 48s | \$130,989 | \$74,124 | 26.97% | 0.883 | 27.634 | 1.140 | −0.225 | 0.851 |
 | CCAO   | XGBoost<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span>  | CPU    | 2.0.0.1         |                    100% |               2m 41s |                    12s |           2m 14s | \$126,389 | \$74,129 | 26.76% | 0.885 | 27.458 | 1.130 | −0.212 | 0.866 |
 | NVIDIA | LightGBM                                                                                                                     | CPU    | 3.3.5           |                    100% |               4m 12s |                     9s |           19m 5s | \$130,989 | \$74,124 | 26.97% | 0.883 | 27.634 | 1.140 | −0.225 | 0.851 |
-| NVIDIA | LightGBM                                                                                                                     | CPU    | 4.1.0.99        |                    100% |                4m 7s |                     9s |          18m 52s | \$130,989 | \$74,124 | 26.97% | 0.883 | 27.634 | 1.140 | −0.225 | 0.851 |
-| NVIDIA | LightGBM<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>2</sup></span> | GPU    | 4.1.0.99        |                     10% |               5m 56s |                    11s |          19m 10s | \$130,546 | \$74,296 | 27.27% | 0.884 | 27.929 | 1.143 | −0.231 | 0.846 |
-| NVIDIA | XGBoost<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span>  | CPU    | 2.0.0.1         |                    100% |                1m 6s |                     4s |              20s | \$126,024 | \$73,961 | 26.76% | 0.886 | 27.467 | 1.130 | −0.209 | 0.867 |
-| NVIDIA | XGBoost<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span>  | GPU    | 2.0.0.1         |                     92% |               1m 11s |                    13s |               4s | \$126,366 | \$73,981 | 26.86% | 0.885 | 27.543 | 1.131 | −0.214 | 0.865 |
+| NVIDIA | LightGBM                                                                                                                     | CPU    | 4.1.0.99        |                    100% |               1m 37s |                    17s |          19m 44s | \$130,989 | \$74,124 | 26.97% | 0.883 | 27.634 | 1.140 | −0.225 | 0.851 |
+| NVIDIA | LightGBM<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>2</sup></span> | GPU    | 4.1.0.99        |                     10% |               2m 33s |                    19s |          19m 39s | \$130,541 | \$74,282 | 27.23% | 0.884 | 27.903 | 1.143 | −0.230 | 0.847 |
+| NVIDIA | XGBoost<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span>  | CPU    | 2.0.0.1         |                    100% |               1m 25s |                     5s |              52s | \$126,894 | \$74,191 | 26.83% | 0.884 | 27.552 | 1.130 | −0.210 | 0.868 |
+| NVIDIA | XGBoost<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span>  | GPU    | 2.0.0.1         |                     92% |               1m 12s |                    13s |               5s | \$126,952 | \$74,124 | 26.78% | 0.885 | 27.515 | 1.130 | −0.213 | 0.867 |
+| AWS    | LightGBM                                                                                                                     | CPU    | 4.1.0.99        |                    100% |               2m 38s |                  1m 1s |       1h 45m 59s | \$130,989 | \$74,124 | 26.97% | 0.883 | 27.634 | 1.140 | −0.225 | 0.851 |
+| AWS    | LightGBM                                                                                                                     | GPU    | 4.1.0.99        |                      8% |               3m 56s |                 1m 10s |       1h 47m 19s | \$130,632 | \$74,210 | 27.18% | 0.884 | 27.866 | 1.143 | −0.230 | 0.847 |
+| AWS    | XGBoost                                                                                                                      | CPU    | 2.0.0.1         |                    100% |               1m 58s |                    11s |           1m 31s | \$125,867 | \$73,899 | 26.79% | 0.886 | 27.510 | 1.130 | −0.212 | 0.869 |
+| AWS    | XGBoost                                                                                                                      | GPU    | 2.0.0.1         |                     95% |               1m 31s |                    17s |               6s | \$126,679 | \$74,002 | 26.80% | 0.885 | 27.523 | 1.130 | −0.210 | 0.867 |
 
 1.  Categoricals with over 50 values are hashed, otherwise one-hot
     encoded.
@@ -39,18 +43,19 @@ Below are the results of our tests.
 
 ## Hardware
 
-These tests were run on two different machines: an on-prem modeling
-server used by the CCAO and a test server provided by NVIDIA via the
-[LaunchPad](https://www.nvidia.com/en-us/launchpad/) program. The
-machines have the following specifications:
+These tests were run on three different machines: an on-prem modeling
+server used by the CCAO, a test server provided by NVIDIA via the
+[LaunchPad](https://www.nvidia.com/en-us/launchpad/) program, and a
+standard AWS `g5.4xlarge` EC2 instance. The machines have the following
+specifications:
 
-|              | CCAO                                     | NVIDIA                                 |
-|--------------|------------------------------------------|----------------------------------------|
-| **CPU**      | Xeon Silver 4208 CPU @ 2.10GHz, 16 cores | Xeon Gold 6354 CPU @ 3.00GHz, 72 cores |
-| **Memory**   | 128GiB                                   | 512GiB                                 |
-| **GPU**      | \-                                       | NVIDIA A40, 48GB                       |
-| **OS**       | Ubuntu 22.04 LTS                         | Ubuntu 22.04 LTS                       |
-| **Compiler** | gcc (11.4.0) -O3 -march=native           | gcc (11.4.0) -O3 -march=native         |
+|              | CCAO                                     | NVIDIA                                 | g5.4xlarge                       |
+|--------------|------------------------------------------|----------------------------------------|----------------------------------|
+| **CPU**      | Xeon Silver 4208 CPU @ 2.10GHz, 16 cores | Xeon Gold 6354 CPU @ 3.00GHz, 16 cores | AMD EPYC 7R32 @ 3.3GHz, 16 cores |
+| **Memory**   | 128GiB                                   | 512GiB                                 | 64GiB                            |
+| **GPU**      | \-                                       | NVIDIA A40, 48GB                       | NVIDIA A10G, 24GB                |
+| **OS**       | Ubuntu 22.04 LTS                         | Ubuntu 22.04 LTS                       | Ubuntu 22.04 LTS                 |
+| **Compiler** | gcc (11.4.0) -O3 -march=native           | gcc (11.4.0) -O3 -march=native         | gcc (11.4.0) -O3 -march=native   |
 
 ## Tasks
 
