@@ -8,7 +8,7 @@ This repository compares the time-to-train of two gradient-boosted decision tree
 1. Which GBDT framework to use for its 2024 automated valuation models
 2. Whether or not to purchase additional hardware (a GPU) in order to improve model training speed
 
-Below are the results of our tests. 
+Below are the results of our tests.
 
 > :warning: **NOTE:**
 >
@@ -92,15 +92,15 @@ gt() %>%
 
 ## Hardware
 
-These tests were run on two different machines: an on-prem modeling server used by the CCAO and a test server provided by NVIDIA via the [LaunchPad](https://www.nvidia.com/en-us/launchpad/) program. The machines have the following specifications:
+These tests were run on three different machines: an on-prem modeling server used by the CCAA, a test server provided by NVIDIA via the [LaunchPad](https://www.nvidia.com/en-us/launchpad/) program, and a standard AWS `g5.4xlarge` EC2 instance. The machines have the following specifications:
 
-|              | CCAO                                     | NVIDIA                                 |
-|--------------|------------------------------------------|----------------------------------------|
-| **CPU**      | Xeon Silver 4208 CPU @ 2.10GHz, 16 cores | Xeon Gold 6354 CPU @ 3.00GHz, 72 cores |
-| **Memory**   | 128GiB                                   | 512GiB                                 |
-| **GPU**      | -                                        | NVIDIA A40, 48GB                       |
-| **OS**       | Ubuntu 22.04 LTS                         | Ubuntu 22.04 LTS                       |
-| **Compiler** | gcc (11.4.0) -O3 -march=native           | gcc (11.4.0) -O3 -march=native         |
+|              | CCAO                                     | NVIDIA                                 | g5.4xlarge                             |
+|--------------|------------------------------------------|----------------------------------------| ---------------------------------------|
+| **CPU**      | Xeon Silver 4208 CPU @ 2.10GHz, 16 cores | Xeon Gold 6354 CPU @ 3.00GHz, 16 cores | AMD EPYC 7R32 @ 3.3GHz, 16 cores       |
+| **Memory**   | 128GiB                                   | 512GiB                                 | 64GiB                                  |
+| **GPU**      | -                                        | NVIDIA A40, 48GB                       | NVIDIA A10G, 24GB                      |
+| **OS**       | Ubuntu 22.04 LTS                         | Ubuntu 22.04 LTS                       | Ubuntu 22.04 LTS                       |
+| **Compiler** | gcc (11.4.0) -O3 -march=native           | gcc (11.4.0) -O3 -march=native         | gcc (11.4.0) -O3 -march=native         |
 
 ## Tasks
 
